@@ -6,7 +6,7 @@ document.body.addEventListener('mouseover', async (e) => {
     : (Element.closest('a') as HTMLAnchorElement)
   let url = ''
   if (anchorElement && anchorElement.href) {
-    anchorElement.focus()
+    // anchorElement.focus()
     url = anchorElement.href
   }
   if (url && url !== _currentURL) {

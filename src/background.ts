@@ -1,4 +1,4 @@
-let prefix = ''
+let prefix = 'yy '
 let active = false
 let focused = false
 function textClipBoard(text: string) {
