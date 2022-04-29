@@ -1,16 +1,45 @@
-let prefix = 'yy '
+let prefix = ''
 let active = false
 let focused = false
-function textClipBoard(text: string) {
+function textClipBoard(text: string, failed?: string) {
+  function popToast(msg: string, failedMsg?: string) {
+    let existElement = document.querySelector('#copy_address_1843_cw')
+    if (existElement) existElement.remove()
+    let toastElement = document.createElement('div')
+    toastElement.innerText = `Copied!, "${
+      msg.length > 50 ? msg.slice(0, 50) + '...' : msg
+    }"`
+    if (failedMsg) toastElement.innerText = failedMsg
+    toastElement.style.position = 'fixed'
+    toastElement.style.zIndex = '99999'
+    toastElement.style.top = '30px'
+    toastElement.style.right = '30px'
+    toastElement.style.background = '#ffffffcc'
+    toastElement.style.borderRadius = '12px'
+    toastElement.style.fontSize = '14px'
+    toastElement.style.padding = '5px 12px'
+    toastElement.style.color = '#32383a'
+    toastElement.id = 'copy_address_1843_cw'
+    document.body.appendChild(toastElement)
+    toastElement.addEventListener('click', () => {
+      toastElement.remove()
+    })
+    setTimeout(() => {
+      toastElement.remove()
+    }, 3000)
+  }
+  if (failed) {
+    popToast('', failed)
+    return
+  }
   text = prefix + text
-  console.log('Call copy::', text)
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(
       function () {
-        console.log('Copying to clipboard was successful!')
+        popToast(text)
       },
       function (err) {
-        console.error('Could not copy text: ', err)
+        popToast('Copy Failed')
       }
     )
     return
@@ -26,7 +55,12 @@ function textClipBoard(text: string) {
   range.selectNode(textarea)
   selection.removeAllRanges()
   selection.addRange(range)
-  console.log('copy success', document.execCommand('copy'))
+  const copied = document.execCommand('copy')
+  if (copied) {
+    popToast(text)
+  } else {
+    popToast('Copy Failed')
+  }
   selection.removeAllRanges()
 
   document.body.removeChild(textarea)
@@ -65,12 +99,12 @@ interface UrlType {
 }
 chrome.commands.onCommand.addListener((command) => {
   chrome.storage.local.get(['url'], (items) => {
-    if (items.url) {
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        let tabId = tabs[0].id ? tabs[0].id : 0
-        if (tabId) {
-          var updateProperties = { active: true }
-          chrome.tabs.update(tabId, updateProperties, (tab) => {})
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      let tabId = tabs[0].id ? tabs[0].id : 0
+      if (tabId) {
+        var updateProperties = { active: true }
+        chrome.tabs.update(tabId, updateProperties, (tab) => {})
+        if (items.url && active && focused) {
           chrome.scripting
             .executeScript({
               target: { tabId },
@@ -78,8 +112,16 @@ chrome.commands.onCommand.addListener((command) => {
               args: [items.url],
             })
             .then((res) => {})
+        } else if (active && !focused) {
+          chrome.scripting
+            .executeScript({
+              target: { tabId },
+              func: textClipBoard,
+              args: [items.url, 'Document is not focused!'],
+            })
+            .then((res) => {})
         }
-      })
-    }
+      }
+    })
   })
 })
