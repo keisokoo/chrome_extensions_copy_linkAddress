@@ -71,16 +71,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.options) {
     chrome.storage.sync.set({ options: request.options }, () => {})
   }
-  if (request.url) {
-    chrome.storage.local.set({ url: request.url }, () => {})
-  }
   if (typeof request.focus === 'boolean') {
     focused = request.focus
     if (active) {
       if (request.focus) {
         chrome.action.setIcon({ path: 'logo_green_48.png' })
+        chrome.storage.local.set({ url: request.url }, () => {})
       } else {
         chrome.action.setIcon({ path: 'logo_alert_48.png' })
+        chrome.storage.local.set({ url: '' }, () => {})
       }
     }
   }

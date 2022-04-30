@@ -7,7 +7,7 @@ interface FormValues {
   after: string
 }
 let forms = (document.forms as any)['options'].elements as FormElement
-chrome.storage.sync.get(['options'], (items) => {
+chrome.storage?.sync.get(['options'], (items) => {
   if (!items.options) return
   let values = items.options as FormValues
 
@@ -31,7 +31,7 @@ submitButton.addEventListener('click', () => {
   timeout = setTimeout(() => {
     msgElement.innerText = ''
   }, 2000)
-  chrome.runtime.sendMessage({ options: postData }, () => {
+  chrome.runtime?.sendMessage({ options: postData }, () => {
     return true
   })
 })
