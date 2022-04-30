@@ -1,6 +1,6 @@
-let prefix = ''
 let active = false
 let focused = false
+
 function textClipBoard(text: string, failed?: string) {
   function popToast(msg: string, failedMsg?: string) {
     let existElement = document.querySelector('#copy_address_1843_cw')
@@ -32,7 +32,6 @@ function textClipBoard(text: string, failed?: string) {
     popToast('', failed)
     return
   }
-  text = prefix + text
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(
       function () {
@@ -69,6 +68,9 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log('installed')
 })
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.options) {
+    chrome.storage.sync.set({ options: request.options }, () => {})
+  }
   if (request.url) {
     chrome.storage.local.set({ url: request.url }, () => {})
   }
@@ -97,6 +99,11 @@ chrome.action.onClicked.addListener((tab) => {
 interface UrlType {
   url: string
 }
+
+interface FormValues {
+  before: string
+  after: string
+}
 chrome.commands.onCommand.addListener((command) => {
   chrome.storage.local.get(['url'], (items) => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -105,13 +112,25 @@ chrome.commands.onCommand.addListener((command) => {
         var updateProperties = { active: true }
         chrome.tabs.update(tabId, updateProperties, (tab) => {})
         if (items.url && active && focused) {
-          chrome.scripting
-            .executeScript({
-              target: { tabId },
-              func: textClipBoard,
-              args: [items.url],
-            })
-            .then((res) => {})
+          let copyText = items.url
+          chrome.storage.sync.get(['options'], (items) => {
+            if (!items.options) return
+            let values = items.options as FormValues
+
+            if (values.before) {
+              copyText = values.before + copyText
+            }
+            if (values.after) {
+              copyText = copyText + values.after
+            }
+            chrome.scripting
+              .executeScript({
+                target: { tabId },
+                func: textClipBoard,
+                args: [copyText],
+              })
+              .then((res) => {})
+          })
         } else if (active && !focused) {
           chrome.scripting
             .executeScript({

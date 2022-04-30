@@ -4,6 +4,7 @@
   "version": "1.0",
   "manifest_version": 3,
   "permissions": ["activeTab", "scripting", "storage"],
+  "options_page": "options.html",
   "action": {
     "default_icon": "icon.png",
     "48": "logo48.png",

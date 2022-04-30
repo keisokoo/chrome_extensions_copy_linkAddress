@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Options</title>
+    <script type="module" crossorigin src="/options.js"></script>
+    <link rel="stylesheet" href="/options.css" />
+  </head>
+  <body>
+    <div id="app-container">
+      <form name="options">
+        <div>
+          <label for="before">Before text</label>
+          <input type="text" name="before" id="before" />
+        </div>
+        <div>
+          <label for="after">After text</label>
+          <input type="text" name="after" id="after" />
+        </div>
+      </form>
+      <div>
+        <button id="submit">Save!</button>
+      </div>
+      <div id="msg"></div>
+    </div>
+  </body>
+</html>

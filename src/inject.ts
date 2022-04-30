@@ -1,7 +1,4 @@
 let _currentURL = ''
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log(sender, request)
-})
 document.body.addEventListener('mouseover', async (e) => {
   let Element = e.target as HTMLElement
   let anchorElement = (Element as HTMLAnchorElement).href
@@ -15,19 +12,16 @@ document.body.addEventListener('mouseover', async (e) => {
   if (url && url !== _currentURL) {
     _currentURL = url
     if (document.hasFocus()) {
-      console.log('yes')
-
-      chrome.runtime.sendMessage({ focus: true }, (res) => {})
+      chrome.runtime.sendMessage({ focus: true }, (res) => {
+        return true
+      })
     } else {
-      console.log('no')
-      chrome.runtime.sendMessage({ focus: false }, (res) => {})
+      chrome.runtime.sendMessage({ focus: false }, (res) => {
+        return true
+      })
     }
     chrome.runtime.sendMessage({ url }, (res) => {
-      if (!res?.success) {
-        console.log('error')
-      } else {
-        console.log('res', res)
-      }
+      return true
     })
   }
 })

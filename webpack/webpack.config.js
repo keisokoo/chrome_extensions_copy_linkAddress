@@ -6,6 +6,7 @@ module.exports = {
   entry: {
     background: path.resolve(__dirname, '..', 'src', 'background.ts'),
     inject: path.resolve(__dirname, '..', 'src', 'inject.ts'),
+    options: path.resolve(__dirname, '..', 'src', 'options.ts'),
   },
   output: {
     path: path.join(__dirname, '../dist'),
